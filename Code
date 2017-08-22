@@ -1,0 +1,62 @@
+ef main():
+	print (stable_matching(((3,2,1),(3,2,1),(3,2,1)), ((1,2,3),(1,2,3),(1,2,3))))
+
+"""
+FUNCTION SPECIFICATION
+=== Input ===
+The function `stable_marriage` accepts two arguments, M and W.
+M is a tuple of N tuples; each inner tuple has N elements. The i-th tuple
+(1-based) contains the numbers A1, A2, ..., AN, which is a permutation of
+1,2,...,N. This describes the preference of the i-th man: he prefers woman A1
+more than woman A2, which in turn is more than woman A3, and so on until AN in
+the last place.
+W is also a tuple of N tuples, describing the preferences of the women in the
+same fashion.
+=== Output ===
+A list of N pairs. Each pair (Mi, Wi) describes that Mi should be paired with
+Wi.
+===============================================================================
+"""
+
+def stable_matching(M, W):
+	
+	# implement here:
+
+	n = len(M)
+	men = range(n)	# a list of unmatched men
+	men_preference = [0 for m in range(n)]	# men's preference of current partner
+	women_preference = [n for m in range(n)]	# women's preference of current partner
+	results = []
+
+	# loop until all men to be matched
+	while len(men):
+		m = men[0]	# first men in the list
+		i = men_preference[m]
+		while i < n:
+			w = M[m][i] - 1	# men's i-th preferred choice
+			if women_preference[w] == n:	# w is unmatched
+				results.append((m+1, w+1))	# append matched pair to the result list
+				men_preference[m] = i	# set man's preference of current partner
+				women_preference[w] = W[w].index(m+1) # set woman's preference of current partner
+				men.pop(0)	# pop man from the list of unmatched men
+				break	# break the for loop
+			elif W[w].index(m+1) < women_preference[w]:	# w prefers m to current partner
+				m_prev = W[w][women_preference[w]] - 1	# m_prev = previous partner of w
+				results.remove((m_prev+1, w+1)) # remove previous pair from the result list
+				men.append(m_prev) # append previous partner to the list of unmatched men
+				men_preference[m_prev] += 1	# 
+				results.append((m+1, w+1))
+				men_preference[m] = i
+				women_preference = W[w].index(m+1)
+				men.pop(0)
+				break
+			else:
+				i += 1
+		if i >= n:
+			print 'error: unmatched!'
+
+	return results
+
+
+if __name__ == "__main__":
+    main()
